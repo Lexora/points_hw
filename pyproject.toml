@@ -54,7 +54,7 @@ force_grid_wrap = 0
 # https://github.com/nedbat/coveragepy
 
     [tool.coverage.run]
-    source = ["scr"]
+    source = ["app"]
     branch = true
     omit = ['']
 

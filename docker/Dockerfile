@@ -58,6 +58,7 @@ CMD ["/usr/bin/supervisord"]
 # For example using docker-compose to mount local volume under /app
 FROM python-base as development
 ENV FLASKAPI_ENV = development
+ENV FLASK_APP=main
 
 # Copying poetry and venv into image
 COPY --from=builder-base $POETRY_HOME $POETRY_HOME
@@ -74,10 +75,11 @@ RUN poetry install
 WORKDIR /app
 COPY . .
 
-
-EXPOSE 8000
+ENV FLASK_APP=main
+EXPOSE 8080
 ENTRYPOINT /docker-entrypoint.sh $0 $@
-CMD ["flask", "run"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+# CMD ["main.py"]
 # CMD ["uwsgi", "--reload", "--host=0.0.0.0", "--port=8000", "main:app"]
 
 
@@ -102,6 +104,7 @@ RUN coverage report --fail-under 40
 # in only our runtime deps that were installed in the 'builder-base'
 FROM python-base as production
 ENV FLASKAPI_ENV=production
+ENV FLASK_APP=main
 
 COPY --from=builder-base $VENV_PATH $VENV_PATH
 # COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
@@ -113,6 +116,6 @@ COPY ./app /app
 WORKDIR /app
 
 ENTRYPOINT /docker-entrypoint.sh $0 $@
-CMD ["flask", "run"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]]
 # CMD [ "gunicorn", "--worker-class uvicorn.workers.UvicornWorker", "--config /gunicorn_conf.py", "main:app"]
 

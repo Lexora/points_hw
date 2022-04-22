@@ -1,3 +1,5 @@
 poetry.lock
 .coverage*
 .vscode
+__pycache__
+.pytest_cache
