@@ -36,18 +36,17 @@ RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poet
 # and install only runtime deps using poetry
 WORKDIR $PYSETUP_PATH
 COPY ./poetry.lock ./pyproject.toml ./
-RUN poetry install --no-dev  # respects 
+RUN poetry lock --no-update
+RUN poetry install --no-dev  
 
-RUN useradd --no-create-home nginx
+RUN useradd --no-create-home nginx 
 RUN rm /etc/nginx/sites-enabled/default
 RUN rm -r /root/.cache
 
-COPY nginx.conf /etc/nginx/
-COPY flask-site-nginx.conf /etc/nginx/conf.d/
-COPY uwsgi.ini /etc/uwsgi/
-COPY supervisord.conf /etc/
-COPY /app /project
-WORKDIR /project
+COPY ./server-config/nginx.conf /etc/nginx/
+COPY ./server-config/flask-nginx.conf /etc/nginx/conf.d/
+COPY ./server-config/uwsqi.ini /etc/uwsgi/
+COPY ./server-config/supervisord.conf /etc/
 
 CMD ["/usr/bin/supervisord"]
 
@@ -83,8 +82,8 @@ CMD ["flask", "run"]
 # 'lint' stage runs black and isort
 # running in check mode means build will fail if any linting errors occur
 FROM development AS lint
-RUN black --config ./pyproject.toml --check app tests
-RUN isort --settings-path ./pyproject.toml --recursive --check-only
+RUN black --config ./pyproject.toml --check scr tests
+RUN isort --settings-path ./pyproject.toml . --diff
 CMD ["tail", "-f", "/dev/null"]
 
 
@@ -103,7 +102,7 @@ FROM python-base as production
 ENV FLASKAPI_ENV=production
 
 COPY --from=builder-base $VENV_PATH $VENV_PATH
-COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
+# COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
 
 COPY ./docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
