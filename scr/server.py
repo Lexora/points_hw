@@ -7,6 +7,10 @@ def get_db():
     #return client.application_fake_database
 
 
+@app.route("/")
+def base_route():
+    return "hey there!"
+
 
 
 @app.route("/ping")
