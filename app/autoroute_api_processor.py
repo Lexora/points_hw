@@ -5,6 +5,11 @@ from collections import namedtuple
 
 autoroute_api_processor = Blueprint("autoroute_api_processor", __name__)
 
+
+
+
+
+
 urls = [
     "localhost:5000/autonomous-car/routes/empty-route",
     "localhost:5000/autonomous-car/routes/success-no-obstacles",
