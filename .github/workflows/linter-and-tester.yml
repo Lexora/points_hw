@@ -1,0 +1,12 @@
+name: Test and lint 
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Build
+      run: docker build --tag poetry-project --file docker/Dockerfile .
